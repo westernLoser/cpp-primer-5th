@@ -14,7 +14,9 @@ public:
     String(): elements(nullptr), first_free(nullptr), cap(nullptr) { }
     String(const char*);
     String(const String&);
+    String(String&&) noexcept;
     String& operator=(const String&);
+    String& operator=(String &&) noexcept;
     ~String();
     void push_back(char);
     size_t size() const { return first_free - elements; }
@@ -47,12 +49,29 @@ String::String(const String &s) {
     std::cout << "call String::String(const String &s)" << std::endl;
 }
 
+String::String(String &&s) noexcept : elements(s.elements), first_free(s.first_free), cap(s.cap) {
+    s.elements = s.first_free = s.cap = nullptr;
+    std::cout << "call String::String(String &&s) noexcept" << std::endl;
+}
+
 String& String::operator=(const String &s) {
     auto p = alloc_n_copy(s.begin(), s.end());
     free();
     elements = p.first;
     first_free = cap = p.second;
     std::cout << "call String& String::operator=(const String &s)" << std::endl;
+    return *this;
+}
+
+String& String::operator=(String &&rhs) noexcept {
+    if (this != &rhs) {
+        free();
+        elements = rhs.elements;
+        first_free = rhs.first_free;
+        cap = rhs.cap;
+        rhs.elements = rhs.first_free = rhs.cap = nullptr;
+    }
+    std::cout << "call String& String::operator=(String &&rhs) noexcept" << std::endl;
     return *this;
 }
 
@@ -102,8 +121,6 @@ void String::reallocate() {
     first_free = dest;
     cap = elements + newcapacity;
 }
-
-
 
 #endif
 

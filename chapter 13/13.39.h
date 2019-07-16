@@ -14,7 +14,9 @@ public:
     StrVec(): elements(nullptr), first_free(nullptr), cap(nullptr) { }
     StrVec(std::initializer_list<std::string>);
     StrVec(const StrVec&);
+    StrVec(StrVec &&) noexcept;
     StrVec& operator=(const StrVec&);
+    StrVec& operator=(StrVec&&) noexcept;
     ~StrVec();
     void push_back(const std::string&);
     void reserve(size_t);
@@ -48,11 +50,26 @@ StrVec::StrVec(const StrVec &v) {
     first_free = cap = p.second;
 }
 
+StrVec::StrVec(StrVec &&v) noexcept : elements(v.elements), first_free(v.first_free), cap(v.cap) {
+    v.elements = v.first_free = v.cap = nullptr;
+}
+
 StrVec& StrVec::operator=(const StrVec &rhs) {
     auto data = alloc_n_copy(rhs.begin(), rhs.end());
     free();
     elements = data.first;
     first_free = cap = data.second;
+    return *this;
+}
+
+StrVec& StrVec::operator=(StrVec &&rhs) noexcept {
+    if (this != &rhs) {
+        free();
+        elements = rhs.elements;
+        first_free = rhs.first_free;
+        cap = rhs.cap;
+        rhs.elements = rhs.first_free = rhs.cap = nullptr;
+    }
     return *this;
 }
 
