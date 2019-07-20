@@ -59,6 +59,11 @@ public:
     bool operator!=(const ConstStrBolbPtr& p) { return p.curr != curr; }
     const std::string& deref() const;
     ConstStrBolbPtr& incr();
+    const std::string& operator*() const {
+        auto p = check(curr, "dereference past end");
+        return (*p)[curr];
+    }
+    const std::string* operator->() const { return &this->operator*(); }
 private:
     std::shared_ptr<std::vector<std::string>>
         check(size_t, const std::string&) const;

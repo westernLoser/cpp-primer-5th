@@ -9,9 +9,16 @@
 #include<vector>
 #include<memory>
 #include<stdexcept>
+#include<algorithm>
 
 class StrBolbPtr;
 class StrBolb {
+    friend bool operator==(const StrBolb&, const StrBolb&);
+    friend bool operator!=(const StrBolb&, const StrBolb&);
+    friend bool operator<(const StrBolb&, const StrBolb&);
+    friend bool operator>(const StrBolb&, const StrBolb&);
+    friend bool operator<=(const StrBolb&, const StrBolb&);
+    friend bool operator>=(const StrBolb&, const StrBolb&);
 public:
     friend class StrBolbPtr;
     StrBolbPtr begin();
@@ -27,6 +34,8 @@ public:
     std::string& back();
     const std::string& front() const;
     const std::string& back() const;
+    std::string& operator[](size_t);
+    const std::string& operator[](size_t) const;
 private:
     std::shared_ptr<std::vector<std::string>> data;
     void check(size_type i, const std::string &msg) const;
@@ -34,10 +43,31 @@ private:
 
 
 class StrBolbPtr {
+    friend bool operator==(const StrBolbPtr&, const StrBolbPtr&);
+    friend bool operator!=(const StrBolbPtr&, const StrBolbPtr&);
+    friend bool operator<(const StrBolbPtr&, const StrBolbPtr&);
+    friend bool operator>(const StrBolbPtr&, const StrBolbPtr&);
+    friend bool operator<=(const StrBolbPtr&, const StrBolbPtr&);
+    friend bool operator>=(const StrBolbPtr&, const StrBolbPtr&);
 public:
     StrBolbPtr(): curr(0) { }
     StrBolbPtr(StrBolb& a, size_t sz = 0): wptr(a.data), curr(sz) { }
     bool operator!=(const StrBolbPtr& p) { return p.curr != curr; }
+    std::string& operator[](size_t);
+    const std::string& operator[](size_t) const;
+    StrBolbPtr& operator++();
+    StrBolbPtr& operator--();
+    StrBolbPtr operator++(int);
+    StrBolbPtr operator--(int);
+    StrBolbPtr& operator+=(size_t);
+    StrBolbPtr& operator-=(size_t);
+    StrBolbPtr operator+(size_t);
+    StrBolbPtr operator-(size_t);
+    std::string& operator*() const {
+        auto p = check(curr, "dereference past end");
+        return (*p)[curr];
+    }
+    std::string* operator->() const { return &this->operator*(); }
     std::string& deref() const;
     StrBolbPtr& incr();
 private:
@@ -113,4 +143,118 @@ void StrBolb::pop_back() {
     data->pop_back();
 }
 
+bool operator==(const StrBolb &lhs, const StrBolb &rhs) {
+    return *lhs.data == *rhs.data;
+}
+
+bool operator!=(const StrBolb &lhs, const StrBolb &rhs) {
+    return !(lhs == rhs);
+}
+
+bool operator<(const StrBolb &lhs, const StrBolb &rhs) {
+    return std::lexicographical_compare(lhs.data->begin(), lhs.data->end(),
+                                        rhs.data->begin(), rhs.data->end());
+}
+
+bool operator>(const StrBolb &lhs, const StrBolb &rhs) {
+    return rhs < lhs;
+}
+
+bool operator<=(const StrBolb &lhs, const StrBolb &rhs) {
+    return !(lhs > rhs);
+}
+
+bool operator>=(const StrBolb &lhs, const StrBolb &rhs) {
+    return !(lhs < rhs);
+}
+
+bool operator==(const StrBolbPtr &lhs, const StrBolbPtr &rhs) {
+    return lhs.curr == rhs.curr;
+}
+
+bool operator!=(const StrBolbPtr &lhs, const StrBolbPtr &rhs) {
+    return !(lhs == rhs);
+}
+
+bool operator<(const StrBolbPtr &lhs, const StrBolbPtr &rhs) {
+    return lhs.curr < rhs.curr;
+}
+
+bool operator>(const StrBolbPtr &lhs, const StrBolbPtr &rhs) {
+    return lhs.curr > rhs.curr;
+}
+
+bool operator<=(const StrBolbPtr &lhs, const StrBolbPtr &rhs) {
+    return lhs.curr <= rhs.curr;
+}
+
+bool operator>=(const StrBolbPtr &lhs, const StrBolbPtr &rhs) {
+    return lhs.curr >= rhs.curr;
+}
+
+std::string& StrBolb::operator[](size_t n) {
+    check(n, "out of range");
+    return data->at(n);
+}
+
+const std::string& StrBolb::operator[](size_t n) const {
+    check(n, "out of range");
+    return data->at(n);
+}
+
+std::string& StrBolbPtr::operator[](size_t n) {
+    auto p = check(n, "dereference out of range.");
+    return (*p)[n];
+}
+
+const std::string& StrBolbPtr::operator[](size_t n) const {
+    auto p = check(n, "dereference out of range.");
+    return (*p)[n];
+}
+
+StrBolbPtr& StrBolbPtr::operator++() {
+    check(curr, "increment past end of StrBolbPtr");
+    ++curr;
+    return *this;
+}
+
+StrBolbPtr& StrBolbPtr::operator--() {
+    --curr;
+    check(curr, "decrement past begin of StrBolbPtr");
+    return *this;
+}
+
+StrBolbPtr StrBolbPtr::operator++(int) {
+    StrBolbPtr ret = *this;
+    ++*this;
+    return ret;
+}
+
+StrBolbPtr StrBolbPtr::operator--(int) {
+    StrBolbPtr ret = *this;
+    --*this;
+    return ret;
+}
+
+StrBolbPtr& StrBolbPtr::operator+=(size_t n) {
+    curr += n;
+    check(curr, "increment past end of StrBolbPtr");
+    return *this;
+}
+
+StrBolbPtr& StrBolbPtr::operator-=(size_t n) {
+    curr -= n;
+    check(curr, "decrement past begin of StrBolbPtr");
+    return *this;
+}
+StrBolbPtr StrBolbPtr::operator+(size_t n) {
+    StrBolbPtr ret = *this;
+    ret += n;
+    return ret;
+}
+StrBolbPtr StrBolbPtr::operator-(size_t n) {
+    StrBolbPtr ret = *this;
+    ret -= n;
+    return ret;
+}
 #endif

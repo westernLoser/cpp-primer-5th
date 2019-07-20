@@ -10,6 +10,13 @@
 #include<iostream>
 
 class String {
+    friend std::ostream& operator<<(std::ostream&, const String&);
+    friend bool operator==(const String&, const String&);
+    friend bool operator!=(const String&, const String&);
+    friend bool operator<(const String&, const String&);
+    friend bool operator>(const String&, const String&);
+    friend bool operator<=(const String&, const String&);
+    friend bool operator>=(const String&, const String&);
 public:
     String(): elements(nullptr), first_free(nullptr), cap(nullptr) { }
     String(const char*);
@@ -24,6 +31,8 @@ public:
     char* begin() const { return elements; }
     char* end() const { return first_free; }
     void show() const;
+    char& operator[](size_t n) { return elements[n]; }
+    const char& operator[](size_t n) const { return elements[n]; }
 private:
     static std::allocator<char> alloc;
     char *elements;
@@ -120,6 +129,43 @@ void String::reallocate() {
     elements = newdata;
     first_free = dest;
     cap = elements + newcapacity;
+}
+
+std::ostream& operator<<(std::ostream& os, const String &s) {
+    for (auto p = s.elements; p != s.first_free; ++p) {
+        os << *p;
+    }
+    return os;
+}
+
+bool operator==(const String &lhs, const String &rhs) {
+    auto p = lhs.begin(), q = rhs.begin();
+    for (; p != lhs.end() && q != rhs.end(); ++p, ++q) {
+        if (*p != *q)
+            break;
+    }
+    return p == lhs.end() && q == rhs.end();
+}
+
+bool operator!=(const String &lhs, const String &rhs) {
+    return !(lhs == rhs);
+}
+
+bool operator<(const String &lhs, const String &rhs) {
+    return std::lexicographical_compare(lhs.begin(), lhs.end(),
+                                        rhs.begin(), rhs.end());
+}
+
+bool operator>(const String &lhs, const String &rhs) {
+    return rhs < lhs;
+}
+
+bool operator<=(const String &lhs, const String &rhs) {
+    return !(lhs > rhs);
+}
+
+bool operator>=(const String &lhs, const String &rhs) {
+    return !(lhs < rhs);
 }
 
 #endif

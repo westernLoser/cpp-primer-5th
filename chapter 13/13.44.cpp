@@ -13,6 +13,8 @@ int main() {
         std::cout << s.size() << " " << s.capacity() << std::endl;
         s.show();
     }
+    //for 14.7
+    std::cout << "s: " << s << std::endl;
     system("pause");
     return 0;
 }

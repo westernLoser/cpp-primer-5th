@@ -8,14 +8,22 @@
 #include<string>
 #include<utility>
 #include<memory>
+#include<algorithm>
 
 class StrVec {
+    friend bool operator==(const StrVec&, const StrVec&);
+    friend bool operator!=(const StrVec&, const StrVec&);
+    friend bool operator<(const StrVec&, const StrVec&);
+    friend bool operator>(const StrVec&, const StrVec&);
+    friend bool operator<=(const StrVec&, const StrVec&);
+    friend bool operator>=(const StrVec&, const StrVec&);
 public:
     StrVec(): elements(nullptr), first_free(nullptr), cap(nullptr) { }
     StrVec(std::initializer_list<std::string>);
     StrVec(const StrVec&);
     StrVec(StrVec &&) noexcept;
     StrVec& operator=(const StrVec&);
+    StrVec& operator=(std::initializer_list<std::string>);
     StrVec& operator=(StrVec&&) noexcept;
     ~StrVec();
     void push_back(const std::string&);
@@ -25,6 +33,8 @@ public:
     size_t capacity() const { return cap - elements; }
     std::string* begin() const { return elements; }
     std::string* end() const { return first_free;}
+    std::string& operator[](size_t n) { return elements[n]; }
+    const std::string& operator[](size_t n) const { return elements[n]; }
 private:
     static std::allocator<std::string> alloc;
     void check_n_alloc() { if (size() == capacity()) reallocate(); }
@@ -56,6 +66,14 @@ StrVec::StrVec(StrVec &&v) noexcept : elements(v.elements), first_free(v.first_f
 
 StrVec& StrVec::operator=(const StrVec &rhs) {
     auto data = alloc_n_copy(rhs.begin(), rhs.end());
+    free();
+    elements = data.first;
+    first_free = cap = data.second;
+    return *this;
+}
+
+StrVec& StrVec::operator=(std::initializer_list<std::string> il) {
+    auto data = alloc_n_copy(il.begin(), il.end());
     free();
     elements = data.first;
     first_free = cap = data.second;
@@ -131,6 +149,36 @@ void StrVec::do_reallocate(size_t newcapacity) {
     elements = newdata;
     first_free = dest;
     cap = elements + newcapacity;
+}
+
+bool operator==(const StrVec &lhs, const StrVec &rhs) {
+    auto p = lhs.begin(), q = rhs.begin();
+    for (; p != lhs.end() && q != rhs.end(); ++p, ++q) {
+        if (*p != *q)
+            break;
+    }
+    return p == lhs.end() && q == rhs.end();
+}
+
+bool operator!=(const StrVec &lhs, const StrVec &rhs) {
+    return !(lhs == rhs);
+}
+
+bool operator<(const StrVec &lhs, const StrVec &rhs) {
+    return std::lexicographical_compare(lhs.begin(), lhs.end(),
+                                        rhs.begin(), rhs.end());
+}
+
+bool operator>(const StrVec &lhs, const StrVec &rhs) {
+    return rhs < lhs;
+}
+
+bool operator<=(const StrVec &lhs, const StrVec &rhs) {
+    return !(lhs > rhs);
+}
+
+bool operator>=(const StrVec &lhs, const StrVec &rhs) {
+    return !(lhs < rhs);
 }
 
 #endif
