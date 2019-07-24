@@ -39,7 +39,19 @@
         "xtr1common": "cpp",
         "xutility": "cpp",
         "unordered_map": "cpp",
-        "allocators": "cpp"
+        "allocators": "cpp",
+        "algorithm": "cpp",
+        "forward_list": "cpp",
+        "fstream": "cpp",
+        "functional": "cpp",
+        "iterator": "cpp",
+        "list": "cpp",
+        "map": "cpp",
+        "numeric": "cpp",
+        "set": "cpp",
+        "sstream": "cpp",
+        "xhash": "cpp",
+        "xtree": "cpp"
     },
     "C_Cpp.errorSquiggles": "Disabled"
 }
