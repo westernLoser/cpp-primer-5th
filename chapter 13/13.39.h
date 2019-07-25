@@ -28,7 +28,7 @@ public:
     ~StrVec();
     void push_back(const std::string&);
     void reserve(size_t);
-    void resize(size_t n, const std::string &s);
+    void resize(size_t n, const std::string &s = std::string());
     size_t size() const { return first_free - elements; }
     size_t capacity() const { return cap - elements; }
     std::string* begin() const { return elements; }
@@ -106,7 +106,7 @@ void StrVec::reserve(size_t n) {
     }
 }
 
-void StrVec::resize(size_t n, const std::string &s = std::string()) {
+void StrVec::resize(size_t n, const std::string &s) {
     if (n > size()) {
         if (n > capacity()) reserve(n * 2);
         for (size_t i = size(); i != n; ++i) {
