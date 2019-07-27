@@ -63,6 +63,9 @@ private:
 };
 
 template<typename T>
+std::allocator<T> Vec<T>::alloc;
+
+template<typename T>
 Vec<T>::Vec(std::initializer_list<T> il) {
     auto p = alloc_n_copy(il.begin(), il.end());
     elements = p.first;

@@ -1,13 +1,14 @@
 /*
   author : szz
-  date : 2019/07/24
+  date : 2019/07/26
 */
-#ifndef C_16_12_H
-#define C_16_12_H
+#ifndef C_16_29_H
+#define C_16_29_H
 
 #include<vector>
 #include<memory>
 #include<stdexcept>
+#include"16.28.shared_ptr.h"
 
 template<typename> class BolbPtr;
 
@@ -20,18 +21,20 @@ public:
     typedef typename std::vector<T>::size_type size_type;
     Bolb();
     Bolb(std::initializer_list<T> il);
-    template<typename It>
-    Bolb(It begin, It end): data(std::make_shared<std::vector<T>(begin, end)>) { }
     size_type size() const { return data->size(); };
     bool empty() const { return data->empty(); };
     void push_back(const T &t) { data->push_back(t); };
     void pop_back();
     T& front();
     T& back();
+    T& operator[](size_type i) const {
+        check(i, "index out of range");
+        return data->operator[](i);
+    }
     const T& front() const;
     const T& back() const;
 private:
-    std::shared_ptr<std::vector<T>> data;
+    SharedPointer<std::vector<T>> data;
     void check(size_type i, const std::string&) const;
 };
 
@@ -87,11 +90,11 @@ BolbPtr<T> Bolb<T>::end() {
 }
 
 template<typename T>
-Bolb<T>::Bolb(): data(std::make_shared<std::vector<T>>()) { }
+Bolb<T>::Bolb(): data(makeShared<std::vector<T>>()) { }
 
 template<typename T>
 Bolb<T>::Bolb(std::initializer_list<T> il):
-                 data(std::make_shared<std::vector<T>>(il)) { }
+                 data(makeShared<std::vector<T>>(il)) { }
 
 template<typename T>
 void Bolb<T>::check(size_type i, const std::string &msg) const {

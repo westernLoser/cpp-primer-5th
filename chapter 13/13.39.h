@@ -48,6 +48,8 @@ private:
     std::string *cap;
 };
 
+std::allocator<std::string> StrVec::alloc;
+
 StrVec::StrVec(std::initializer_list<std::string> il) {
     auto p = alloc_n_copy(il.begin(), il.end());
     elements = p.first;
