@@ -41,6 +41,11 @@ public:
     Vec& operator=(Vec&&) noexcept;
     ~Vec();
     void push_back(const T&);
+    template<typename... Args>
+    void emplace_back(Args&& ... args) {
+        check_n_alloc();
+        alloc.construct(first_free++, std::forward<Args>(args)...);
+    }
     void reserve(size_t);
     void resize(size_t n, const T &s = T());
     size_t size() const { return first_free - elements; }

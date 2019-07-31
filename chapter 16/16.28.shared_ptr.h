@@ -121,9 +121,9 @@ private:
     }
 };
 
-template<typename T, typename... args>
-SharedPointer<T> makeShared(args... a) {
-    T* raw = new T(a...);
+template<typename T, typename... Args>
+SharedPointer<T> makeShared(Args&& ... args) {
+    T* raw = new T(std::forward<Args>(args)...);
     return SharedPointer<T>(raw);
 }
 
