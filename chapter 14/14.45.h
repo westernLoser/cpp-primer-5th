@@ -10,7 +10,7 @@
 
 class Sales_data {
     friend std::istream& operator>>(std::istream&, Sales_data&);
-    friend std::ostream& operator<<(std::ostream&, Sales_data&);
+    friend std::ostream& operator<<(std::ostream&, const Sales_data&);
     friend Sales_data operator+(const Sales_data&, const Sales_data&);
 public:
     Sales_data(const std::string &s = "", unsigned n = 0, double p = 0.0):
@@ -48,14 +48,14 @@ std::istream& operator>>(std::istream &is, Sales_data &item) {
     return is;
 }
 
-std::ostream& operator<<(std::ostream &os, Sales_data &item) {
-    os << item.bookNo << item.units_sold << item.revenue;
+std::ostream& operator<<(std::ostream &os, const Sales_data &item) {
+    os << item.bookNo << " " << item.units_sold << " "  << item.revenue;
     return os;
 }
 
 Sales_data operator+(const Sales_data &lhs, const Sales_data &rhs) {
     Sales_data temp = lhs;
-    temp += lhs;
+    temp += rhs;
     return temp;
 }
 
