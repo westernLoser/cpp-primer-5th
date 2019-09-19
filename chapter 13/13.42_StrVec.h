@@ -8,7 +8,7 @@
 #include<string>
 #include<utility>
 #include<memory>
-
+//#include"..\chapter 19\19.1.h"
 class StrVec {
 public:
     StrVec(): elements(nullptr), first_free(nullptr), cap(nullptr) { }
